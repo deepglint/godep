@@ -340,11 +340,15 @@ func copyFile(dst, src string) error {
 		return err
 	}
 
-	if strings.HasSuffix(dst, ".go") {
-		err = copyWithoutImportComment(w, r)
-	} else {
-		_, err = io.Copy(w, r)
-	}
+	// Some lines in auto-generated files exceed the 64k line length limit.
+	// So copy the whole file here for long-lined files.
+	// Otherwise, those files will be truncted.
+
+	// if strings.HasSuffix(dst, ".go") {
+	// 	err = copyWithoutImportComment(w, r)
+	// } else {
+	_, err = io.Copy(w, r)
+	// }
 	err1 := w.Close()
 	if err == nil {
 		err = err1
